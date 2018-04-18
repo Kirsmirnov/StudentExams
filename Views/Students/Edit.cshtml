@@ -1,0 +1,38 @@
+﻿@using StudentExams.Models
+@model StudentExams.Models.User
+
+@{
+    ViewBag.Title = "Редактирование студента";
+    var StudentGroups = ((List<StudentGroup>)ViewBag.StudentGroups).Select(t => new SelectListItem()
+    {
+        Value = t.Id.ToString(),
+        Text = t.Name
+    }).ToList();
+}
+
+@using (Html.BeginForm("Save", "Students", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.UserId)
+    @Html.HiddenFor(m => m.PasswordHash)
+    @Html.HiddenFor(m => m.IsActive)
+    <table class="FormTable">
+        <tr>
+            <td>Номер студ. билета / логин*:</td>
+            <td>@Html.TextBoxFor(m => m.UserLogin, new Dictionary<string, object>() { { "autocomplete", "off" } })</td>
+        </tr>
+        <tr>
+            <td>ФИО студента*:</td>
+            <td>@Html.TextBoxFor(m => m.UserName, new Dictionary<string, object>() { { "autocomplete", "off" } })</td>
+        </tr>
+        <tr>
+            <td>Группа*:</td>
+            <td>@Html.DropDownListFor(m => m.StudentGroupId, StudentGroups)</td>
+        </tr>
+        <tr>
+            <td align="right" colspan="2" style="padding-top: 16px;">
+                <input type="submit" value="Сохранить" />
+                <input type="button" value="Отмена" onclick="window.location='@(Url.Action("Index", new { id = ViewBag.StudentGroupId }))'" />
+            </td>
+        </tr>
+    </table>
+}

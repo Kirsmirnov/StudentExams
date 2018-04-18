@@ -1,0 +1,70 @@
+﻿@model StudentExams.ViewModels.GridViewModel
+@{ 
+    string prefix = Model.Instance.ToString();
+}
+
+<script type="text/javascript">
+    function DeleteRecord@(prefix)(id) {
+        @if (Model.AllowDelete) {
+            <text>
+                if (confirm("@(Model.DeleteConfirmText)")) {
+                    window.location = "@(Model.DeleteUrl)" + "?id=" + id;
+                }
+            </text>
+            }
+    }
+    function EditRecord@(prefix)(id) {
+        @if (Model.AllowEdit) {
+                <text>window.location = "@(Model.EditUrl)" + "?id=" + id;</text>
+            }
+    }
+    function DoCommand@(prefix)(url, id) {
+        @if (Model.AllowEdit) {
+            <text>
+            window.location = url + "?id=" + id;
+            </text>
+        }
+    }
+</script>
+
+@if (Model.AllowAdd)
+{
+    <div class="Toolbar">
+        <input type="button" value="@Model.AddNewText" onclick="window.location='@Model.AddNewUrl'" />
+    </div>
+}
+<table border="1" style="width: 100%" class="GridView">
+    <tr class="GridViewHeader">
+        @for (int i = 0; i < Model.Columns.Length; i++)
+        {
+            <td class="GridViewHeaderCell" style="@Model.Columns[i].HeaderStyleSpec">@Model.Columns[i].Title</td>
+        }
+        @for (int i = 0; i < Model.Commands.Length; i++)
+        {
+            <td class="GridViewHeaderCell GridViewCommandHeaderCell">@Model.Commands[i].HeaderTitle</td>
+        }
+        @if (Model.AllowDelete)
+        {
+            <td class="GridViewHeaderCell GridViewDeleteHeaderCell">&nbsp;</td>
+        }
+    </tr>
+    @foreach(var item in Model.Items)
+    {
+        string[] fieldValues = Model.FormatDataItemFields(item);
+        object idProperty = Model.GetDataItemProperty(item, Model.IdProperty);
+        <tr class="GridViewRow">
+            @for (int i = 0; i < Model.Columns.Length; i++)
+            {
+                <td class="GridViewRowCell" style="@Model.Columns[i].StyleSpec" onclick="EditRecord@(prefix)('@idProperty')">@fieldValues[i]</td>
+            }
+            @for (int i = 0; i < Model.Commands.Length; i++)
+            {
+                <td class="GridViewRowCell GridViewCommandCell" onclick="DoCommand@(prefix)('@Model.Commands[i].Url', '@idProperty')" title="@(Model.Commands[i].Hint)">@Model.Commands[i].Title</td>
+            }
+            @if (Model.AllowDelete)
+            {
+                <td class="GridViewRowCell GridViewDeleteCell" onclick="DeleteRecord@(prefix)('@idProperty')">[&nbsp;Удалить&nbsp;]</td>
+            }
+        </tr>
+    }
+</table>

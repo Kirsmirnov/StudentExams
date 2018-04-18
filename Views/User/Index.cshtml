@@ -1,0 +1,24 @@
+﻿@using System.Web.Mvc;
+@using StudentExams.ViewModels;
+
+@{
+    ViewBag.Title = "Пользователи";
+}
+
+@Html.Partial("GridView", new GridViewModel()
+{
+    Items = ViewBag.Items,
+    IdProperty = "Id",
+    AddNewText = "Создать пользователя...",
+    DeleteConfirmText = "Удалить пользователя?",
+    AddNewUrl = Url.Action("Edit"),
+    EditUrl = Url.Action("Edit"),
+    DeleteUrl = Url.Action("Delete"),
+    Columns = new GridViewColumn[]
+    {
+        new GridViewColumn("ID", "Id") { StyleSpec="text-align: center" },
+        new GridViewColumn("Логин", "UserLogin"),
+        new GridViewColumn("ФИО", "UserName"),
+        new GridViewColumn("Роль", "GroupName")
+    }
+})

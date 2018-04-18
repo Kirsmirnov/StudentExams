@@ -1,0 +1,22 @@
+﻿@{
+    ViewBag.Title = "Вход для студентов";
+}
+
+@using (Html.BeginForm("CheckLoginStudent", "Login", FormMethod.Post))
+{
+    <table>
+        <tr>
+            <td>Логин*:</td>
+            <td><input type="text" name="Login" /></td>
+        </tr>
+        <tr>
+            <td>Пароль*:</td>
+            <td><input type="password" name="Password" /> </td>
+        </tr>
+        <tr>
+            <td align="right" colspan="2"><input type="submit" value="Войти" /></td>
+        </tr>
+    </table>
+}
+
+<a href="@(Url.Action("TeacherLogin"))" class="Link">Вход для преподавателей</a>

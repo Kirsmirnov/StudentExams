@@ -1,0 +1,32 @@
+﻿@using StudentExams.Models;
+@{
+    ViewBag.Title = "Вход для преподавателей";
+    List<User> users = ViewBag.UserList;
+}
+
+@using (Html.BeginForm("CheckLoginTeacher", "Login", FormMethod.Post))
+{
+    <table>
+        <tr>
+            <td>Логин*:</td>
+            <td>
+                <select name="Login" style="width: 100%">
+                    <option/>
+                    @foreach(User u in users)
+                    {
+                        <option value="@u.UserLogin">@u.UserName</option>
+                    }
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Пароль*:</td>
+            <td><input type="password" name="Password" /> </td>
+        </tr>
+        <tr>
+            <td align="right" colspan="2"><input type="submit" value="Войти" /></td>
+        </tr>
+    </table>
+}
+
+<a href="@(Url.Action("StudentLogin"))" class="Link">Вход для студентов</a>

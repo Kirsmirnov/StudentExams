@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="~/Content/main.css">
+    <title>Система учета знаний учащихся</title>
+</head>
+<body>
+
+    <div class="MainHeader">Система учета знаний учащихся</div>
+
+    @if (Authentication.User != null)
+    {
+    <div class="MainMenu">
+        @if (Authentication.IsStudent)
+        {
+        <a class="MenuUrl" href="@(Url.Action("MyExamResults", "Home"))">Мои оценки</a>
+        <a class="MenuUrl" href="@(Url.Action("Index", "StudentWork"))">Задания</a>
+        }
+        @if (Authentication.IsTeacher || Authentication.IsAdmin)
+        {
+        <a class="MenuUrl" href="@(Url.Action("Index", "ExamList"))">Ведомости</a>
+        <a class="MenuUrl" href="@(Url.Action("Index", "StudentWork"))">Проверка заданий</a>
+        <a class="MenuUrl" href="@(Url.Action("Index", "Predmet"))">Предметы</a>
+        <a class="MenuUrl" href="@(Url.Action("Index", "StudentGroup"))">Группы</a>
+        }
+        @if (Authentication.IsAdmin)
+        {
+        <a class="MenuUrl" href="@(Url.Action("Index", "User"))">Пользователи</a>
+        }
+        <span style="float: right">
+            <span>@Authentication.User.UserName (@Authentication.User.UserGroup.Name) | </span>
+            <a class="MenuUrl" href="@(Url.Action("ChangePassword", "Login"))">Изменить пароль</a>
+            <a class="MenuUrl" href="@(Url.Action("Logout", "Login"))">Выход</a>
+        </span>
+    </div>
+    }
+
+    <h1>@ViewBag.Title</h1>
+    <hr/>
+
+    @if (!string.IsNullOrWhiteSpace(ViewBag.Message))
+    {
+        <div class="ErrorMessage">@ViewBag.Message</div>
+    }
+
+    @RenderBody()
+</body>
+</html>

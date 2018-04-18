@@ -1,0 +1,100 @@
+﻿@using System.Web.Mvc;
+@using StudentExams.Models;
+@using StudentExams.ViewModels;
+@model StudentExams.ViewModels.StudentWorkViewModel
+
+@{
+    ViewBag.Title = "Задания на проверку";
+    var Groups = ((List<StudentGroup>)ViewBag.Groups).Select(t => new SelectListItem()
+    {
+        Value = t.Id.ToString(),
+        Text = t.Name
+    }).ToList();
+    Groups.Insert(0, new SelectListItem());
+
+    var Predmets = ((List<Predmet>)ViewBag.Predmets).Select(t => new SelectListItem()
+    {
+        Value = t.Id.ToString(),
+        Text = t.Name
+    }).ToList();
+    Predmets.Insert(0, new SelectListItem());
+
+    var Teachers = ((List<User>)ViewBag.Teachers).Select(t => new SelectListItem()
+    {
+        Value = t.UserId.ToString(),
+        Text = t.UserName
+    }).ToList();
+    Teachers.Insert(0, new SelectListItem());
+
+    var WorkTypes = ((List<WorkType>)ViewBag.WorkTypes).Select(t => new SelectListItem()
+    {
+        Value = t.Id.ToString(),
+        Text = t.Name
+    }).ToList();
+    WorkTypes.Insert(0, new SelectListItem());
+
+    var WorkStatuses = ((List<string>)ViewBag.Statuses).Select(t => new SelectListItem()
+    {
+        Value = t,
+        Text = t
+    }).ToList();
+    WorkStatuses.Insert(0, new SelectListItem());
+}
+
+<style type="text/css">
+    select{
+        width: 350px;
+    }
+</style>
+
+<h3>Фильтр:</h3>
+@using (Html.BeginForm("Index", "StudentWork", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.Id)
+    <table class="FormTable">
+        <tr style="@(Authentication.IsStudent?"display:none":"")">
+            <td>Группа:</td>
+            <td>@Html.DropDownListFor(m => m.StudentGroupId, Groups)</td>
+        </tr>
+        <tr>
+            <td>Предмет:</td>
+            <td>@Html.DropDownListFor(m => m.PredmetId, Predmets)</td>
+        </tr>
+        <tr>
+            <td>Вид работы:</td>
+            <td>@Html.DropDownListFor(m => m.WorkTypeId, WorkTypes)</td>
+        </tr>
+        <tr>
+            <td>Cтатус:</td>
+            <td>@Html.DropDownListFor(m => m.WorkStatus, WorkStatuses)</td>
+            <td>
+                <input type="submit" value="Применить фильтр" />
+            </td>
+        </tr>
+    </table>
+}
+
+<hr />
+
+@Html.Partial("GridView", new GridViewModel()
+{
+    Items = ViewBag.Items,
+    IdProperty = "Id",
+    AddNewText = "Добавить задание на проверку...",
+    DeleteConfirmText = "Удалить задание?",
+    AddNewUrl = Url.Action("Create"),
+    EditUrl = Url.Action("Edit"),
+    DeleteUrl = Url.Action("Delete"),
+    AllowAdd = Authentication.IsStudent,
+    AllowDelete = (Authentication.IsStudent || Authentication.IsAdmin),
+    Columns = new GridViewColumn[]
+    {
+new GridViewColumn("Дата", "WorkDate") { StyleSpec="width: 100px; text-align: center;", Format="dd.MM.yyyy" },
+new GridViewColumn("Предмет", "Predmet"),
+new GridViewColumn("Вид работы", "WorkType"),
+new GridViewColumn("Преподаватель", "Teacher"),
+new GridViewColumn("Студент", "Student"),
+new GridViewColumn("Группа", "StudentGroup"),
+new GridViewColumn("Статус задания", "WorkStatus")
+    }
+})

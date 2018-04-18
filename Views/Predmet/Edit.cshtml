@@ -1,0 +1,22 @@
+﻿@model StudentExams.Models.Predmet
+
+@{
+    ViewBag.Title = "Редактирование предмета";
+}
+
+@using (Html.BeginForm("Save", "Predmet", FormMethod.Post))
+{
+    @Html.HiddenFor(m=>m.Id)
+    <table class="FormTable">
+        <tr>
+            <td>Наименование*:</td>
+            <td>@Html.TextAreaFor(m=>m.Name, new Dictionary<string, object>() { { "autocomplete", "off" } })</td>
+        </tr>
+        <tr>
+            <td align="right" colspan="2" style="padding-top: 16px;">
+                <input type="submit" value="Сохранить" />
+                <input type="button" value="Отмена" onclick="window.location='@(Url.Action("Index"))'" />
+            </td>
+        </tr>
+    </table>
+}

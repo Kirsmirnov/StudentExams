@@ -1,0 +1,154 @@
+﻿@using System.Web.Mvc;
+@using StudentExams.Models;
+@using StudentExams.ViewModels;
+@model StudentExams.Models.StudentWork
+
+@{
+    ViewBag.Title = "Редактирование задания";
+
+    var Predmets = ((List<Predmet>)ViewBag.Predmets).Select(t => new SelectListItem()
+    {
+        Value = t.Id.ToString(),
+        Text = t.Name
+    }).ToList();
+    Predmets.Insert(0, new SelectListItem());
+
+    var Teachers = ((List<User>)ViewBag.Teachers).Select(t => new SelectListItem()
+    {
+        Value = t.UserId.ToString(),
+        Text = t.UserName
+    }).ToList();
+    Teachers.Insert(0, new SelectListItem());
+
+    var WorkTypes = ((List<WorkType>)ViewBag.WorkTypes).Select(t => new SelectListItem()
+    {
+        Value = t.Id.ToString(),
+        Text = t.Name
+    }).ToList();
+    WorkTypes.Insert(0, new SelectListItem());
+
+    bool IsTeacher = Authentication.IsAdmin || Authentication.IsTeacher;
+}
+
+<style type="text/css">
+    select {
+        width: 350px;
+    }
+    textarea {
+        width: 350px;
+    }
+</style>
+
+@using (Html.BeginForm("null", "StudentWork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.WorkDate)
+    @Html.HiddenFor(m => m.StudentId)
+    @Html.HiddenFor(m => m.WorkStatus)
+    @Html.HiddenFor(m => m.WorkFileName)
+    <table class="FormTable" cellpadding="2">
+        <tr>
+            <td>Дата:</td>
+            <td>@Model.WorkDate.ToString("dd.MM.yyyy")</td>
+        </tr>
+        <tr>
+            <td>Студент:</td>
+            <td>@Model.Student.UserName</td>
+        </tr>
+        <tr>
+            <td>Группа:</td>
+            <td>@(Model?.Student?.StudentGroup?.Name)</td>
+        </tr>
+        <tr>
+            <td>Предмет:</td>
+            <td>
+                @if (Authentication.IsStudent && (Model.WorkStatus == StudentWorkStatus.REJECTED || Model.WorkStatus == StudentWorkStatus.DRAFT))
+                {
+                    @Html.DropDownListFor(m => m.PredmetId, Predmets)
+                }
+                else
+                {
+                    @Html.HiddenFor(m => m.PredmetId)
+                    @(Model?.Predmet?.Name)
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Вид работы:</td>
+            <td>
+                @if (Authentication.IsStudent && (Model.WorkStatus == StudentWorkStatus.REJECTED || Model.WorkStatus == StudentWorkStatus.DRAFT))
+                {
+                    @Html.DropDownListFor(m => m.WorkTypeId, WorkTypes)
+                }
+                else
+                {
+                    @Html.HiddenFor(m => m.WorkTypeId)
+                    @(Model?.WorkType?.Name)
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Преподаватель:</td>
+            <td>
+                @if (Authentication.IsStudent && (Model.WorkStatus == StudentWorkStatus.REJECTED || Model.WorkStatus == StudentWorkStatus.DRAFT))
+                {
+                    @Html.DropDownListFor(m => m.TeacherId, Teachers)
+                }
+                else
+                {
+                    @Html.HiddenFor(m => m.TeacherId)
+                    @(Model?.Teacher?.UserName)
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Cтатус работы:</td>
+            <td>@Model.WorkStatus</td>
+        </tr>
+        <tr>
+            <td>Приложенный файл:</td>
+            <td>
+                @if (Authentication.IsStudent && (Model.WorkStatus == StudentWorkStatus.REJECTED || Model.WorkStatus == StudentWorkStatus.DRAFT))
+                {
+                    <input type="file" name="upload" />
+                }
+                @if (!string.IsNullOrEmpty(Model.WorkFileName))
+                {
+                    @Html.ActionLink("Скачать", "Download", new { id = Model.Id })
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Комментарии преподавателя:</td>
+            <td>
+                @if (IsTeacher)
+                {
+                    @Html.TextAreaFor(m => m.TeacherComments)
+                }
+                else
+                {
+                    @Html.HiddenFor(m => m.TeacherComments)
+                    @Html.TextArea("txbTeacherComments", Model.TeacherComments, new { disabled="disabled" })
+                }
+            </td>
+        </tr>
+        <tr>
+            <td align="right" colspan="2" style="padding-top: 16px;">
+                @if (Model.WorkStatus == StudentWorkStatus.DRAFT && Authentication.IsStudent)
+                {
+                    <input type="submit" value="Сохранить как черновик" formaction="@(Url.Action("SaveAsDraft"))" />
+                }
+                @if ((Model.WorkStatus == StudentWorkStatus.DRAFT || Model.WorkStatus == StudentWorkStatus.REJECTED) && Authentication.IsStudent)
+                {
+                    <input type="submit" value="Передать на проверку" formaction="@(Url.Action("SaveAsChecking"))" />
+                }
+                @if (Model.WorkStatus == StudentWorkStatus.CHECKING && (IsTeacher))
+                {
+                <input type="submit" value="Вернуть на доработку" formaction="@(Url.Action("SaveAsRejected"))" />
+                <input type="submit" value="Принять работу" formaction="@(Url.Action("SaveAsApprooved"))" />
+                }
+                <input type="button" value="Отмена" onclick="window.location='@(Url.Action("Index"))'" />
+            </td>
+        </tr>
+    </table>
+}

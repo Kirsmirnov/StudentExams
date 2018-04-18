@@ -1,0 +1,22 @@
+﻿@using System.Web.Mvc;
+@using StudentExams.ViewModels;
+
+@{
+    ViewBag.Title = "Мои оценки";
+}
+
+@Html.Partial("GridView", new GridViewModel()
+{
+    Items = ViewBag.MyExamResults,
+    AllowAdd=false,
+    AllowDelete=false,
+    AllowEdit=false,
+    Columns = new GridViewColumn[]
+    {
+        new GridViewColumn("Дата", "ExamDate") { StyleSpec="width: 100px; text-align: center;", Format="dd.MM.yyyy" },
+        new GridViewColumn("Тип", "ExamType"),
+        new GridViewColumn("Предмет", "PredmetName"),
+        new GridViewColumn("Преподаватель", "TeacherName"),
+        new GridViewColumn("Оценка", "ExamResult") {StyleSpec="width: 100px; text-align: center;" }
+    }
+})

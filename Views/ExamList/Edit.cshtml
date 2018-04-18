@@ -1,0 +1,84 @@
+﻿@using StudentExams.Models
+@model StudentExams.Models.ExamList
+
+@{
+    ViewBag.Title = "Редактирование ведомости";
+}
+
+@functions{
+    List<SelectListItem> GetRanksList(string currentValue)
+    {
+        string[] ranks = new string[0];
+        if (Model.ExamType.Name == "Зачет")
+        {
+            ranks = new string[] { "Зачтено", "Не зачтено" };
+        }
+        if (Model.ExamType.Name == "Экзамен" || Model.ExamType.Name == "Курсовая работа")
+        {
+            ranks = new string[] { "2 (неуд.)", "3 (удовл.)", "4 (хор.)", "5 (отл.)" };
+        }
+        var RanksList = new List<SelectListItem>();
+        RanksList.Add(new SelectListItem());
+        foreach (string rank in ranks)
+        {
+            RanksList.Add(new SelectListItem() { Text = rank, Value = rank, Selected = (currentValue == rank) });
+        }
+        return RanksList;
+    }
+}
+
+@using (Html.BeginForm("SaveExisting", "ExamList", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.TeacherId)
+    <table class="FormTable" cellpadding="4">
+        <tr>
+            <td>Дата:</td>
+            <td>@Model.ExamDate.ToString("dd.MM.yyyy")</td>
+        </tr>
+        <tr>
+            <td>Преподаватель:</td>
+            <td>@Model.Teacher.UserName</td>
+        </tr>
+        <tr>
+            <td>Тип:</td>
+            <td>@Model.ExamType.Name</td>
+        </tr>
+        <tr>
+            <td>Предмет:</td>
+            <td>@Model.Predmet.Name</td>
+        </tr>
+        <tr>
+            <td>Группа:</td>
+            <td>@Model.StudentGroup.Name</td>
+        </tr>
+    </table>
+
+    <hr />
+
+    <table class="GridView" border="1" style="width: 100%">
+        <tr class="GridViewHeader">
+            <td class="GridViewHeaderCell">№ п/п</td>
+            <td class="GridViewHeaderCell">ФИО студента</td>
+            <td class="GridViewHeaderCell">Оценка</td>
+        </tr>
+        @for (int i = 0; i < Model.ExamListDetail.Count; i++)
+        {
+            <tr class="GridViewRow">
+                <td class="GridViewRowCell" style="text-align: center; width: 50px">@((i + 1).ToString())</td>
+                <td class="GridViewRowCell">@Model.ExamListDetail[i].Student.UserName</td>
+                <td class="GridViewRowCell" style="width: 50px;">
+                    @Html.HiddenFor(m => m.ExamListDetail[i].StudentId)
+                    @Html.DropDownListFor(m => m.ExamListDetail[i].ExamResult, GetRanksList(Model.ExamListDetail[i].ExamResult))
+                </td>
+            </tr>
+        }
+    </table>
+
+    <p>
+
+        <input type="submit" value="Сохранить ведомость" />
+        <input type="button" value="Отмена" onclick="window.location='@(Url.Action("Index"))'" />
+
+    </p>
+}

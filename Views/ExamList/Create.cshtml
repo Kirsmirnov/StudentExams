@@ -1,0 +1,60 @@
+﻿@using StudentExams.Models
+@model StudentExams.Models.ExamList
+
+@{
+    ViewBag.Title = "Создание ведомости";
+    var Groups = ((List<StudentGroup>)ViewBag.Groups).Select(t => new SelectListItem()
+    {
+        Value = t.Id.ToString(),
+        Text = t.Name
+    }).ToList();
+    Groups.Insert(0, new SelectListItem());
+
+    var Predmets = ((List<Predmet>)ViewBag.Predmets).Select(t => new SelectListItem()
+    {
+        Value = t.Id.ToString(),
+        Text = t.Name
+    }).ToList();
+    Predmets.Insert(0, new SelectListItem());
+
+    var ExamTypes = ((List<ExamType>)ViewBag.ExamTypes).Select(t => new SelectListItem()
+    {
+        Value = t.Id.ToString(),
+        Text = t.Name
+    }).ToList();
+    ExamTypes.Insert(0, new SelectListItem());
+}
+
+@using (Html.BeginForm("SaveCreated", "ExamList", FormMethod.Post))
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.TeacherId)
+    <table class="FormTable">
+        <tr>
+            <td>Дата:</td>
+            <td>@Model.ExamDate.ToString("dd.MM.yyyy")</td>
+        </tr>
+        <tr>
+            <td>Преподаватель*:</td>
+            <td>@Authentication.User.UserName</td>
+        </tr>
+        <tr>
+            <td>Тип*:</td>
+            <td>@Html.DropDownListFor(m => m.ExamTypeId, ExamTypes)</td>
+        </tr>
+        <tr>
+            <td>Предмет*:</td>
+            <td>@Html.DropDownListFor(m => m.PredmetId, Predmets)</td>
+        </tr>
+        <tr>
+            <td>Группа*:</td>
+            <td>@Html.DropDownListFor(m => m.StudentGroupId, Groups)</td>
+        </tr>
+        <tr>
+            <td align="right" colspan="2" style="padding-top: 16px;">
+                <input type="submit" value="Создать ведомость" />
+                <input type="button" value="Отмена" onclick="window.location='@(Url.Action("Index"))'" />
+            </td>
+        </tr>
+    </table>
+}
